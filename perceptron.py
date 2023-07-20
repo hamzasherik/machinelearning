@@ -34,41 +34,45 @@ class perceptron(ABC):
         rgen = np.random.RandomState(self.random_state)
         self.w_ = rgen.normal(scale=0.01, size=X.shape[1])
 
-        # calculate weighted input (z)
-        z = np.dot(self.w_, np.transpose(X)) + self.b_
+        # TODO: train until number of epochs is reached OR convergence OR threshold accuracy reached
+        # train until number of epochs is reached
+        for i in range(self.epochs):
+            # calculate weighted input (z)
+            z = np.dot(self.w_, np.transpose(X)) + self.b_
 
-        # calculate activation
-        activations = self.calculate_activations(z)
+            # calculate activation
+            activations = self.calculate_activations(z)
 
-        # NOTE: can split into 2 methods
-        # calculate delta_w and delta_b
-        delta_w, delta_b = self.calculate_deltas(y, activations, X)
+            # calculate delta_w and delta_b
+            delta_w, delta_b = self.calculate_deltas(y, activations, X)
 
-        # apply delta w and delta b to w and b respectively
+            # apply delta_w and delta_b to w and b respectively
+            self.w_ += delta_w
+            self.b_ += delta_b
 
-        # rerun until prediction converges (linear decision boundary where model accuracy is 100%) or after threshold accuracy is reached or after a number of epochs
-
-        # return models (weights and bias)
-        #self.w_ =
-        #self.b_ = 
-
-    def test(self, X: np.ndarray, y: np.ndarray) -> float:
+    def test(self, X_test: np.ndarray, y_test: np.ndarray) -> float:
         """
         method that tests trained model against test set
 
         Parameters
         ----------
-        X: test set input matrix
-        y: ground truth labels vector
+        X_test: test set input matrix
+        y_test: ground truth labels vector
+        Returns
+        -------
+        float: accuracy on test set
         """
 
         # calculate weighted input (z)
+        z = np.dot(self.w_, np.transpose(X_test)) + self.b_
 
-        # calculate activation (unit step function)
+        # calculate activations
+        activations = self.calculate_activations(z)
 
-        # determine if prediction == ground truth label and increment correct counter by 1
+        # calculate accuracy
+        accuracy = np.count_nonzero(np.equal(activations, y_test)) / np.size(y)
 
-        # compare correct counter to length of y (correct counter / len(y) * 100) and return result
+        return accuracy
 
     def calculate_activations(self, z: np.ndarray) -> np.ndarray:
         """
@@ -104,15 +108,14 @@ class perceptron(ABC):
         X: input data (samples)
         Returns
         -------
-
+        np.ndarray, np.ndarray: delta w and delta b matrices
         """
 
         # calculate delta_w 
         delta_w = np.dot(self.eta * np.subtract(ground_truth, predicted), X)
 
         # calculate delta_b
-        # NOTE: this returns an array of biases, 1 bias for each sample. Is that correct or should bias be a single integer element.
-        delta_b = self.eta * np.subtract(ground_truth, predicted)
+        delta_b = np.sum(self.eta * np.subtract(ground_truth, predicted))
 
         return delta_w, delta_b
 
@@ -125,5 +128,18 @@ if __name__ == "__main__":
     X = np.array([[1,3,4,5], [1,1,2,6], [4,5,1,4]]) 
     eta = 1
 
+    rgen = np.random.RandomState(1)
+    w_ = rgen.normal(scale=0.01, size=X.shape[1])
+
+    print(w_ + np.dot(eta * np.subtract(ground_truth,predicted), X))
+
     print(np.dot(eta * np.subtract(ground_truth,predicted), X))
-    print(eta * np.subtract(ground_truth, predicted))
+    print(np.sum(eta * np.subtract(ground_truth, predicted)))
+
+    activations = np.array([1,1,0,0,1,1])
+    y = np.array([1,1,0,1,1,0])
+
+    test = np.equal(activations, y)
+    print(np.count_nonzero(test))
+
+    print(np.size(test))
