@@ -37,19 +37,12 @@ class perceptron(ABC):
         # calculate weighted input (z)
         z = np.dot(self.w_, np.transpose(X)) + self.b_
 
-        # TODO: confirm for-in changes sample in z. Confirm for-in iterates through each element in a numpy array. Move activation check to a separate method.
         # calculate activation
-        for sample in z:
-            if sample >= 0:
-                sample = 1
-            else:
-                sample = 0
+        activations = self.calculate_activations(z)
 
-        # TODO: confirm len() can be used on numpy array.
-        # TODO: z shouldn't be in calculation of delta_w and delta_b below
-        # calculate delta w and delta b
-        for label in range(len(z)):
-            delta_w = self.eta * (z[label] - y[label]) * X[label]
+        # NOTE: can split into 2 methods
+        # calculate delta_w and delta_b
+        delta_w, delta_b = self.calculate_deltas(y, activations, X)
 
         # apply delta w and delta b to w and b respectively
 
@@ -77,6 +70,60 @@ class perceptron(ABC):
 
         # compare correct counter to length of y (correct counter / len(y) * 100) and return result
 
+    def calculate_activations(self, z: np.ndarray) -> np.ndarray:
+        """
+        method that calculates the activation for each input
+
+        Parameters
+        ----------
+        z: weighted input matrix
+
+        Returns
+        -------
+        np.ndarray: activations matrix
+        """
+
+        activations = np.ndarray(z.shape)
+
+        for i, weighted_input in enumerate(z):
+            if weighted_input >= 0:
+                activations[i] = 1
+            else:
+                activations[i] = 0
+
+        return activations
+    
+    def calculate_deltas(self, ground_truth: np.ndarray, predicted: np.ndarray, X: np.ndarray):
+        """
+        method that calculates delta_w and delta_b
+
+        Parameters
+        ----------
+        ground_truth: ground truth labels
+        predicted: predicted labels 
+        X: input data (samples)
+        Returns
+        -------
+
+        """
+
+        # calculate delta_w 
+        delta_w = np.dot(self.eta * np.subtract(ground_truth, predicted), X)
+
+        # calculate delta_b
+        # NOTE: this returns an array of biases, 1 bias for each sample. Is that correct or should bias be a single integer element.
+        delta_b = self.eta * np.subtract(ground_truth, predicted)
+
+        return delta_w, delta_b
+
+
+        
+
 if __name__ == "__main__":
-    arr = np.array([1,2,3,4])
-    print(arr + 2)
+    ground_truth = np.array([1,0,0])
+    predicted = np.array([1,1,0])
+    X = np.array([[1,3,4,5], [1,1,2,6], [4,5,1,4]]) 
+    eta = 1
+
+    print(np.dot(eta * np.subtract(ground_truth,predicted), X))
+    print(eta * np.subtract(ground_truth, predicted))
