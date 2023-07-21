@@ -2,7 +2,7 @@ import numpy as np
 from abc import ABC
 
 
-class perceptron(ABC):
+class Perceptron(ABC):
     """
     perceptron class
     """
@@ -15,7 +15,39 @@ class perceptron(ABC):
         self.epochs = epochs
         self.random_state = random_state
 
+    def lifecycle(self):
+        """
+        method that executes the lifecycle of the perceptron class
+        """
+
+        X_preprocessed, y_preprocessed = self.preprocess()
+
+        self.train(X_preprocessed, y_preprocessed)
+
+        #test_set_accuracy = self.test(X_test, y_test)
+
     # add preprocess data method to handle missing values and normalize features (similar scale for all features)
+    def preprocess(self, X: np.ndarray, y: np.ndarray):
+        """
+        method that preprocesses input data
+
+        Parameters
+        ----------
+        X:
+        y:
+        Returns
+        -------
+        X_preprocessed:
+        y_preprocessed:
+        """
+
+        # convert labels column from str dtype to float dtype
+        y_preprocessed = np.unique(y, return_inverse=True)[1]
+ 
+        # TODO: preprocess X
+        X_preprocessed = X
+
+        return X_preprocessed, y_preprocessed
 
     def train(self, X: np.ndarray, y: np.ndarray) -> None:
         """
@@ -36,7 +68,8 @@ class perceptron(ABC):
 
         # TODO: train until number of epochs is reached OR convergence OR threshold accuracy reached
         # train until number of epochs is reached
-        for i in range(self.epochs):
+        epoch_ctr = 0
+        while epoch_ctr < self.epochs:
             # calculate weighted input (z)
             z = np.dot(self.w_, np.transpose(X)) + self.b_
 
@@ -50,6 +83,9 @@ class perceptron(ABC):
             self.w_ += delta_w
             self.b_ += delta_b
 
+            #increment epoch ctr
+            epoch_ctr += 1
+
     def test(self, X_test: np.ndarray, y_test: np.ndarray) -> float:
         """
         method that tests trained model against test set
@@ -60,7 +96,7 @@ class perceptron(ABC):
         y_test: ground truth labels vector
         Returns
         -------
-        float: accuracy on test set
+        accuracy: accuracy on test set
         """
 
         # calculate weighted input (z)
@@ -70,7 +106,7 @@ class perceptron(ABC):
         activations = self.calculate_activations(z)
 
         # calculate accuracy
-        accuracy = np.count_nonzero(np.equal(activations, y_test)) / np.size(y)
+        accuracy = np.count_nonzero(np.equal(activations, y_test)) / np.size(y_test)
 
         return accuracy
 
@@ -84,7 +120,7 @@ class perceptron(ABC):
 
         Returns
         -------
-        np.ndarray: activations matrix
+        activations: activations matrix
         """
 
         activations = np.ndarray(z.shape)
@@ -108,7 +144,8 @@ class perceptron(ABC):
         X: input data (samples)
         Returns
         -------
-        np.ndarray, np.ndarray: delta w and delta b matrices
+        delta_w:
+        delta_b:
         """
 
         # calculate delta_w 
@@ -123,23 +160,7 @@ class perceptron(ABC):
         
 
 if __name__ == "__main__":
-    ground_truth = np.array([1,0,0])
-    predicted = np.array([1,1,0])
-    X = np.array([[1,3,4,5], [1,1,2,6], [4,5,1,4]]) 
-    eta = 1
+    labels = np.array(['hi', 'hi', 'bye'])
+    print(np.unique(labels, return_inverse=True)[1])
 
-    rgen = np.random.RandomState(1)
-    w_ = rgen.normal(scale=0.01, size=X.shape[1])
-
-    print(w_ + np.dot(eta * np.subtract(ground_truth,predicted), X))
-
-    print(np.dot(eta * np.subtract(ground_truth,predicted), X))
-    print(np.sum(eta * np.subtract(ground_truth, predicted)))
-
-    activations = np.array([1,1,0,0,1,1])
-    y = np.array([1,1,0,1,1,0])
-
-    test = np.equal(activations, y)
-    print(np.count_nonzero(test))
-
-    print(np.size(test))
+    # create map 
