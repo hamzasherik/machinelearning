@@ -1,4 +1,5 @@
 import numpy as np
+import matplotlib.pyplot as plt
 from abc import ABC
 from logger import logger
 
@@ -8,13 +9,14 @@ class Perceptron(ABC):
     perceptron class
     """
 
-    def __init__(self, eta: float=0.01, epochs: int=50, random_state: int=1) -> None:
+    def __init__(self, eta: float=0.01, epochs: int=50, random_state: int=1, threshold_accuracy: float=0.8) -> None:
         """
         
         """
         self.eta = eta
         self.epochs = epochs
         self.random_state = random_state
+        self.threshold_accuracy = threshold_accuracy
 
     def lifecycle(self, X: np.ndarray, y: np.ndarray) -> bool:
         """
@@ -95,6 +97,11 @@ class Perceptron(ABC):
             # break if model converged
             if accuracy == 1.0:
                 logger.info(f"model converged at epoch {epoch_ctr}")
+                break
+
+            # break if accuracy reaches threshold accuracy
+            if accuracy >= self.threshold_accuracy:
+                logger.info(f"model converged at epoch {epoch_ctr} with accuracy {accuracy}")
                 break
 
             # calculate delta_w and delta_b
@@ -178,3 +185,15 @@ class Perceptron(ABC):
 
         return delta_w, delta_b
     
+    # TODO: finish this method. Will need to save accuracy at each epoch to use this method
+    # TODO: could rename this method and have it graph everything we want, not just conergence over time.
+    #def visualize_convergence(self, accuracy_arr: list[float]) -> None:
+        """
+        method that outputs a graph to visualize model convergence over time
+
+        Parameters
+        ----------
+        accuracy_arr: array housing accuracy at each epoch
+        """
+
+        # plot convergence over time (x-axis: epoch number, y-axis: accuracy)
