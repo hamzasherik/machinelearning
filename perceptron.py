@@ -1,5 +1,6 @@
 import numpy as np
 from abc import ABC
+from logger import logger
 
 
 class Perceptron(ABC):
@@ -15,16 +16,26 @@ class Perceptron(ABC):
         self.epochs = epochs
         self.random_state = random_state
 
-    def lifecycle(self):
+    def lifecycle(self, X: np.ndarray, y: np.ndarray) -> bool:
         """
         method that executes the lifecycle of the perceptron class
+
+        Parameters
+        ----------
+        X: input features matrix
+        y: ground truth labels vector
+        Returns
+        -------
+        bool: true if lifecycle method executed successfully, false otherwise
         """
 
-        X_preprocessed, y_preprocessed = self.preprocess()
+        X_preprocessed, y_preprocessed = self.preprocess(X, y)
 
         self.train(X_preprocessed, y_preprocessed)
 
-        #test_set_accuracy = self.test(X_test, y_test)
+        self.accuracy_ = self.test(X_preprocessed, y_preprocessed)
+
+        return True
 
     # add preprocess data method to handle missing values and normalize features (similar scale for all features)
     def preprocess(self, X: np.ndarray, y: np.ndarray):
@@ -33,12 +44,12 @@ class Perceptron(ABC):
 
         Parameters
         ----------
-        X:
-        y:
+        X: input features matrix
+        y: ground truth labels vector
         Returns
         -------
-        X_preprocessed:
-        y_preprocessed:
+        X_preprocessed: preprocessed input feautures
+        y_preprocessed: preprocessed input labels
         """
 
         # convert labels column from str dtype to float dtype
@@ -49,13 +60,14 @@ class Perceptron(ABC):
 
         return X_preprocessed, y_preprocessed
 
+    # TODO: return bool?
     def train(self, X: np.ndarray, y: np.ndarray) -> None:
         """
         method that trains the model (adjusts weights and bias) 
 
         Parameters
         ----------
-        X: training set input matrix
+        X: input features matrix
         y: ground truth labels vector
         """
 
@@ -66,15 +78,24 @@ class Perceptron(ABC):
         rgen = np.random.RandomState(self.random_state)
         self.w_ = rgen.normal(scale=0.01, size=X.shape[1])
 
-        # TODO: train until number of epochs is reached OR convergence OR threshold accuracy reached
-        # train until number of epochs is reached
+        # TODO: add threshold accuracy check. Add threshold accuracy to class attributes in constructor.
+        # train until number of epochs is reached, or model converged, or after threhsold accuracy reached
         epoch_ctr = 0
-        while epoch_ctr < self.epochs:
+        while epoch_ctr <= self.epochs:
             # calculate weighted input (z)
             z = np.dot(self.w_, np.transpose(X)) + self.b_
 
             # calculate activation
             activations = self.calculate_activations(z)
+
+            # calculate current accuracy
+            accuracy = np.count_nonzero(np.equal(activations, y)) / np.size(y)
+            logger.info(f"accuracy at epoch {epoch_ctr}: {accuracy}")
+
+            # break if model converged
+            if accuracy == 1.0:
+                logger.info(f"model converged at epoch {epoch_ctr}")
+                break
 
             # calculate delta_w and delta_b
             delta_w, delta_b = self.calculate_deltas(y, activations, X)
@@ -85,6 +106,7 @@ class Perceptron(ABC):
 
             #increment epoch ctr
             epoch_ctr += 1
+
 
     def test(self, X_test: np.ndarray, y_test: np.ndarray) -> float:
         """
@@ -149,18 +171,10 @@ class Perceptron(ABC):
         """
 
         # calculate delta_w 
-        delta_w = np.dot(self.eta * np.subtract(ground_truth, predicted), X)
+        delta_w = np.float64(np.dot(self.eta * np.subtract(ground_truth, predicted), X))
 
         # calculate delta_b
         delta_b = np.sum(self.eta * np.subtract(ground_truth, predicted))
 
         return delta_w, delta_b
-
-
-        
-
-if __name__ == "__main__":
-    labels = np.array(['hi', 'hi', 'bye'])
-    print(np.unique(labels, return_inverse=True)[1])
-
-    # create map 
+    
