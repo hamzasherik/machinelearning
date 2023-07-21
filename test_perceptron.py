@@ -22,6 +22,7 @@ class TestPerceptrons(TestCase):
         self.assertEqual(perceptron_instance.eta, 0.1)
         self.assertEqual(perceptron_instance.epochs, 10)
         self.assertEqual(perceptron_instance.random_state, 1)
+        self.assertEqual(perceptron_instance.threshold_accuracy, 0.8)
 
     def test_preprocess(self):
         perceptron_instance = Perceptron(eta=0.1, epochs=10)
