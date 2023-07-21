@@ -30,3 +30,12 @@ class TestPerceptrons(TestCase):
 
         np.testing.assert_array_almost_equal(X_preprocessed, self.X)
         np.testing.assert_array_almost_equal(y_preprocessed, self.y_preprocessed_arr)
+
+    def test_lifecycle(self):
+        perceptron_instance = Perceptron(eta=0.1, epochs=10)
+
+        accuracy = perceptron_instance.lifecycle(self.X, self.y)
+
+        self.assertTrue(accuracy)
+        self.assertAlmostEqual(1.0, perceptron_instance.accuracy_)
+
