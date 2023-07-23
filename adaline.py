@@ -1,4 +1,6 @@
 import numpy as np
+import torch as t
+from torch.nn.functional import normalize
 from abc import ABC
 from logger import logger
 
@@ -52,11 +54,16 @@ class Adaline(ABC):
         y_preprocessed: preprocessed input labels
         """
 
+        # convert dtype of features to float
+        X = X.astype(np.float64)
+
         # convert labels column from str dtype to float dtype
         y_preprocessed = np.unique(y, return_inverse=True)[1]
- 
-        # TODO: preprocess X
-        X_preprocessed = X
+
+        # NOTE: normalization of features DOES NOT stop bias if one feature is always larger than the rest!
+        # preprocess input features
+        X_tensor = t.tensor(X, dtype=t.float64)
+        X_preprocessed = normalize(X_tensor, dim=1).cpu().detach().numpy()
 
         return X_preprocessed, y_preprocessed
     
@@ -83,6 +90,7 @@ class Adaline(ABC):
             # calculate weighted inputs (z)
             z = np.dot(self.w_, np.transpose(X)) + self.b_
 
+            # TODO: get rid of calculate_linear_activations method and just set linear_activations here.
             # calculate linear activations
             linear_activations = self.calculate_linear_activations(z)
 
@@ -139,7 +147,7 @@ class Adaline(ABC):
         accuracy = np.count_nonzero(np.equal(step_activations, y_test)) / np.size(y_test)
 
         return accuracy
-
+    
     def calculate_linear_activations(self, z: np.ndarray) -> np.ndarray:
         """
         method that calculates the activation for each input using a liear activation function
@@ -202,3 +210,11 @@ class Adaline(ABC):
         delta_b = -2 * (self.eta * np.subtract(ground_truth, linear_activations)) / ground_truth.size
 
         return delta_w, delta_b
+
+if __name__ == "__main__":
+    x = np.array([[1,2,4,7], [2,2,1,8], [8,6,4,7]])
+    print(x.dtype)
+    test_1 = t.tensor(x, dtype=t.float32)
+    print(test_1)
+    test = test_1.cpu().detach().numpy()
+    print(type(test))
