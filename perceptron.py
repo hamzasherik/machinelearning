@@ -35,11 +35,11 @@ class Perceptron(ABC):
 
         self.train(X_preprocessed, y_preprocessed)
 
+        # TODO: create test and trian sets and pass in test data instead of train data to calculate accuracy of model
         self.accuracy_ = self.test(X_preprocessed, y_preprocessed)
 
         return True
 
-    # add preprocess data method to handle missing values and normalize features (similar scale for all features)
     def preprocess(self, X: np.ndarray, y: np.ndarray):
         """
         method that preprocesses input data
@@ -80,14 +80,13 @@ class Perceptron(ABC):
         rgen = np.random.RandomState(self.random_state)
         self.w_ = rgen.normal(scale=0.01, size=X.shape[1])
 
-        # TODO: add threshold accuracy check. Add threshold accuracy to class attributes in constructor.
         # train until number of epochs is reached, or model converged, or after threhsold accuracy reached
         epoch_ctr = 0
         while epoch_ctr <= self.epochs:
-            # calculate weighted input (z)
+            # calculate weighted inputs (z)
             z = np.dot(self.w_, np.transpose(X)) + self.b_
 
-            # calculate activation
+            # calculate activations
             activations = self.calculate_activations(z)
 
             # calculate current accuracy
@@ -113,7 +112,6 @@ class Perceptron(ABC):
 
             #increment epoch ctr
             epoch_ctr += 1
-
 
     def test(self, X_test: np.ndarray, y_test: np.ndarray) -> float:
         """
@@ -141,7 +139,7 @@ class Perceptron(ABC):
 
     def calculate_activations(self, z: np.ndarray) -> np.ndarray:
         """
-        method that calculates the activation for each input
+        method that calculates the activations for each input
 
         Parameters
         ----------
@@ -171,6 +169,7 @@ class Perceptron(ABC):
         ground_truth: ground truth labels
         predicted: predicted labels 
         X: input data (samples)
+
         Returns
         -------
         delta_w:
