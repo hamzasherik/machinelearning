@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from abc import ABC
-from logger import logger
+from utils.logger import logger
 
 
 class Perceptron(ABC):

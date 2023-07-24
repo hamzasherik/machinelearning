@@ -2,7 +2,7 @@ import numpy as np
 import torch as t
 from torch.nn.functional import normalize
 from abc import ABC
-from logger import logger
+from utils.logger import logger
 
 class Adaline(ABC):
     """
