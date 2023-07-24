@@ -10,6 +10,7 @@ class Adaline(ABC):
     """
 
     # TODO: need the ability to disable the threshold accuracy feature. We could just set it to 1.0
+    # TODO: add self.errors_ attribute to be used to graph convergence over number of epochs.
     def __init__(self, eta: float=0.01, epochs: int=50, random_state: int=1, threshold_accuracy: float=0.8) -> None:
         """
         
