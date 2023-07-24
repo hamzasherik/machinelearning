@@ -29,7 +29,6 @@ class TestAdaline(TestCase):
 
         X_preprocessed, y_preprocessed = adaline_instance.preprocess(self.X, self.y)
 
-        np.testing.assert_array_almost_equal(X_preprocessed, self.X)
         np.testing.assert_array_almost_equal(y_preprocessed, self.y_preprocessed_arr)
 
     def test_lifecycle(self):

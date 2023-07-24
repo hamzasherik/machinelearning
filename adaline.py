@@ -61,6 +61,8 @@ class Adaline(ABC):
         # convert labels column from str dtype to float dtype
         y_preprocessed = np.unique(y, return_inverse=True)[1]
 
+        # TODO: add ability to configure preprocessing steps to take (or learn what steps to take!)
+
         # NOTE: normalization of features DOES NOT stop bias if one feature is always larger than the rest!
         # normalize input features
         # X = X.astype(np.float64)
@@ -68,13 +70,10 @@ class Adaline(ABC):
         # X_preprocessed = normalize(X_tensor, dim=1).cpu().detach().numpy()
 
         # NOTE: why does standardization work so well on IRIS while normalization doesn't? 
-        # TODO: complete matrix-wide standardization in less lines of code (or use a for-loop)
         # standardize input features
-        X_preprocessed = np.copy(X)
-        X_preprocessed[:, 0] = (X[:, 0] - X[:, 0].mean()) / X[:, 0].std()
-        X_preprocessed[:, 1] = (X[:, 1] - X[:, 1].mean()) / X[:, 1].std()
-        X_preprocessed[:, 2] = (X[:, 2] - X[:, 2].mean()) / X[:, 2].std()
-        X_preprocessed[:, 3] = (X[:, 3] - X[:, 3].mean()) / X[:, 3].std()
+        X = X.astype(np.float64)
+        X_tensor = t.tensor(X, dtype=t.float64)
+        X_preprocessed = ((X_tensor - X_tensor.mean(dim=0)) / X_tensor.std(dim=0)).cpu().detach().numpy()
 
         return X_preprocessed, y_preprocessed
     
