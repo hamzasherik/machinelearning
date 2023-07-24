@@ -9,6 +9,7 @@ class Adaline(ABC):
     adaline (adaptive linear nueron) class
     """
 
+    # TODO: need the ability to disable the threshold accuracy feature. We could just set it to 1.0
     def __init__(self, eta: float=0.01, epochs: int=50, random_state: int=1, threshold_accuracy: float=0.8) -> None:
         """
         
@@ -38,6 +39,8 @@ class Adaline(ABC):
         # TODO: create test and trian sets and pass in test data instead of train data to calculate accuracy of model
         self.accuracy_ = self.test(X_preprocessed, y_preprocessed)
 
+        logger.info(f"final model accuracy: {self.accuracy_}")
+
         return True
     
     def preprocess(self, X: np.ndarray, y: np.ndarray):
@@ -58,10 +61,19 @@ class Adaline(ABC):
         y_preprocessed = np.unique(y, return_inverse=True)[1]
 
         # NOTE: normalization of features DOES NOT stop bias if one feature is always larger than the rest!
-        # preprocess input features
-        X = X.astype(np.float64)
-        X_tensor = t.tensor(X, dtype=t.float64)
-        X_preprocessed = normalize(X_tensor, dim=1).cpu().detach().numpy()
+        # normalize input features
+        # X = X.astype(np.float64)
+        # X_tensor = t.tensor(X, dtype=t.float64)
+        # X_preprocessed = normalize(X_tensor, dim=1).cpu().detach().numpy()
+
+        # NOTE: why does standardization work so well on IRIS while normalization doesn't? 
+        # TODO: complete matrix-wide standardization in less lines of code (or use a for-loop)
+        # standardize input features
+        X_preprocessed = np.copy(X)
+        X_preprocessed[:, 0] = (X[:, 0] - X[:, 0].mean()) / X[:, 0].std()
+        X_preprocessed[:, 1] = (X[:, 1] - X[:, 1].mean()) / X[:, 1].std()
+        X_preprocessed[:, 2] = (X[:, 2] - X[:, 2].mean()) / X[:, 2].std()
+        X_preprocessed[:, 3] = (X[:, 3] - X[:, 3].mean()) / X[:, 3].std()
 
         return X_preprocessed, y_preprocessed
     
@@ -118,8 +130,6 @@ class Adaline(ABC):
 
             #increment epoch ctr
             epoch_ctr += 1
-
-        logger.info(f"reached epoch limit of {epoch_ctr-1} with final model accuracy {accuracy}")
 
     def test(self, X_test: np.ndarray, y_test: np.ndarray) -> float:
         """
@@ -191,11 +201,3 @@ class Adaline(ABC):
         delta_b = np.float64(np.sum((2/ground_truth.size) * (self.eta * np.subtract(ground_truth, linear_activations))))
 
         return delta_w, delta_b
-
-if __name__ == "__main__":
-    x = np.array([[1,2,4,7], [2,2,1,8], [8,6,4,7]])
-    print(x.dtype)
-    test_1 = t.tensor(x, dtype=t.float32)
-    print(test_1)
-    test = test_1.cpu().detach().numpy()
-    print(type(test))

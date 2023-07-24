@@ -33,6 +33,6 @@ class TestAdaline(TestCase):
         np.testing.assert_array_almost_equal(y_preprocessed, self.y_preprocessed_arr)
 
     def test_lifecycle(self):
-        adaline_instance = Adaline(eta=0.1, epochs=10)
+        adaline_instance = Adaline(eta=0.001, epochs=10)
 
         adaline_instance.lifecycle(self.X, self.y)
