@@ -5,7 +5,7 @@ from perceptron import Perceptron
 
 data_url = 'https://archive.ics.uci.edu/ml/machine-learning-databases/iris/iris.data'
 
-class TestPerceptrons(TestCase):
+class TestPerceptron(TestCase):
 
     def setUp(self):
         data = pd.read_csv(data_url).iloc[:99].values
