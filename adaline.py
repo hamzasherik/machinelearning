@@ -178,8 +178,7 @@ class Adaline(ABC):
                 step_activations[i] = 0
 
         return step_activations
-    
-    # TODO: model isn't learning weights properly right now. Need to debug.
+
     def calculate_deltas(self, ground_truth: np.ndarray, linear_activations: np.ndarray, X: np.ndarray):
         """
         method that calculates delta_w and delta_b
