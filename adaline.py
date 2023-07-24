@@ -54,14 +54,12 @@ class Adaline(ABC):
         y_preprocessed: preprocessed input labels
         """
 
-        # convert dtype of features to float
-        X = X.astype(np.float64)
-
         # convert labels column from str dtype to float dtype
         y_preprocessed = np.unique(y, return_inverse=True)[1]
 
         # NOTE: normalization of features DOES NOT stop bias if one feature is always larger than the rest!
         # preprocess input features
+        X = X.astype(np.float64)
         X_tensor = t.tensor(X, dtype=t.float64)
         X_preprocessed = normalize(X_tensor, dim=1).cpu().detach().numpy()
 
@@ -89,10 +87,9 @@ class Adaline(ABC):
         while epoch_ctr <= self.epochs:
             # calculate weighted inputs (z)
             z = np.dot(self.w_, np.transpose(X)) + self.b_
-
-            # TODO: get rid of calculate_linear_activations method and just set linear_activations here.
+            
             # calculate linear activations
-            linear_activations = self.calculate_linear_activations(z)
+            linear_activations = z
 
             # calculate step activations
             step_activations = self.calculate_step_activations(linear_activations)
@@ -111,6 +108,7 @@ class Adaline(ABC):
                 logger.info(f"model converged at epoch {epoch_ctr} with accuracy {accuracy}")
                 break
 
+            # TODO: make sure all inputs are np.float64
             # calculate delta_w and delta_b
             delta_w, delta_b = self.calculate_deltas(y, linear_activations, X)
 
@@ -140,30 +138,13 @@ class Adaline(ABC):
         z = np.dot(self.w_, np.transpose(X_test)) + self.b_
 
         # calculate activations
-        linear_activations = self.calculate_linear_activations(z)
+        linear_activations = z
         step_activations = self.calculate_step_activations(linear_activations)
 
         # calculate accuracy
         accuracy = np.count_nonzero(np.equal(step_activations, y_test)) / np.size(y_test)
 
         return accuracy
-    
-    def calculate_linear_activations(self, z: np.ndarray) -> np.ndarray:
-        """
-        method that calculates the activation for each input using a liear activation function
-
-        Parameters
-        ----------
-        z: weighted input matrix
-
-        Returns
-        -------
-        linear_activations: activations matrix
-        """
-
-        linear_activations = np.array(z)
-
-        return linear_activations
     
     def calculate_step_activations(self, linear_activations: np.ndarray) -> np.ndarray:
         """
@@ -188,6 +169,7 @@ class Adaline(ABC):
 
         return step_activations
     
+    # TODO: model isn't learning weights properly right now. Need to debug.
     def calculate_deltas(self, ground_truth: np.ndarray, linear_activations: np.ndarray, X: np.ndarray):
         """
         method that calculates delta_w and delta_b
@@ -204,10 +186,9 @@ class Adaline(ABC):
         delta_b:
         """
 
-        # NOTE: does eta get broadcasted? does this calculation behave as expected?
-        delta_w = np.float64(-2 * (np.dot(self.eta * np.subtract(ground_truth, linear_activations), X)) / ground_truth.size)
+        delta_w = np.float64((2/ground_truth.size) * (np.dot(self.eta * np.subtract(ground_truth, linear_activations), X)))
 
-        delta_b = -2 * (self.eta * np.subtract(ground_truth, linear_activations)) / ground_truth.size
+        delta_b = np.float64(np.sum((2/ground_truth.size) * (self.eta * np.subtract(ground_truth, linear_activations))))
 
         return delta_w, delta_b
 
