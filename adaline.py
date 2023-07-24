@@ -4,6 +4,7 @@ from torch.nn.functional import normalize
 from abc import ABC
 from utils.logger import logger
 
+# TODO: make sure all data types are consistent/make sense
 class Adaline(ABC):
     """
     adaline (adaptive linear nueron) class
