@@ -1,10 +1,11 @@
 from unittest import TestCase
 import numpy as np
 import pandas as pd
-from adalineSGD import AdalineSGD
+from adaline_SGD import AdalineSGD
 
 data_url = 'https://archive.ics.uci.edu/ml/machine-learning-databases/iris/iris.data'
 
+# TODO: test on binary classification only! 
 class TestAdalineSGD(TestCase):
 
     def setUp(self):

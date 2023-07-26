@@ -196,6 +196,7 @@ class Adaline(ABC):
         delta_b:
         """
 
+        # TODO: missing self.eta
         delta_w = np.float64((2/ground_truth.size) * (np.dot(self.eta * np.subtract(ground_truth, linear_activations), X)))
 
         delta_b = np.float64(np.sum((2/ground_truth.size) * (self.eta * np.subtract(ground_truth, linear_activations))))
