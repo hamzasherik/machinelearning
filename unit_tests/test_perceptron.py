@@ -5,6 +5,7 @@ from perceptron import Perceptron
 
 data_url = 'https://archive.ics.uci.edu/ml/machine-learning-databases/iris/iris.data'
 
+# TODO: test on binary classification only!
 class TestPerceptron(TestCase):
 
     def setUp(self):
