@@ -124,6 +124,7 @@ class AdalineSGD(ABC):
                 logger.info(f"model reached/passed threshold accuracy at epoch {epoch_ctr} with accuracy {accuracy}")
                 break
 
+            # NOTE: for loop below doesn't implement SGD. That's still batch!
             # calculate delta_w and delta_b
             for i in range(y.size):
                 delta_w, delta_b = self.calculate_delta(y[i], linear_activations[i], X[i])
